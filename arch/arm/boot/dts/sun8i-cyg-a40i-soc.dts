@@ -22,6 +22,10 @@
 		serial4 = &uart4;
 		serial5 = &uart5; /* RS485 */
 		serial7 = &uart7;
+		mmc0 = &mmc0;
+		mmc1 = &mmc1;
+		mmc2 = &mmc2;
+		mmc3 = &mmc3;
 	};
 
 	chosen {
