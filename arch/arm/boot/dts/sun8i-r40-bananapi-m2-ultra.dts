@@ -122,6 +122,10 @@
 	status = "okay";
 };
 
+&ehci0 {
+	status = "okay";
+};
+
 &ehci1 {
 	status = "okay";
 };
@@ -164,6 +168,7 @@
 		reg = <0x34>;
 		interrupt-parent = <&nmi_intc>;
 		interrupts = <0 IRQ_TYPE_LEVEL_LOW>;
+		x-powers,drive-vbus-en;
 	};
 };
 
@@ -199,6 +204,10 @@
 	status = "okay";
 };
 
+&ohci0 {
+	status = "okay";
+};
+
 &ohci1 {
 	status = "okay";
 };
@@ -216,6 +225,15 @@
 	vcc-pe-supply = <&reg_eldo1>;
 	vcc-pf-supply = <&reg_dcdc1>;
 	vcc-pg-supply = <&reg_dldo1>;
+
+	/* USB0_DRVVBUS connected to both the PMIC.N_VBUSEN and PI13,
+	 * we chose PMIC.N_VBUSEN for control, so set the gpio as
+	 * input mode here.
+	 */
+	usb0_vbus_enable_gpio: usb0-vbus-enable-gpio {
+		pins = "PI13";
+		function = "gpio_in";
+	};
 };
 
 &reg_aldo2 {
@@ -298,6 +316,11 @@
 	regulator-name = "vdd2v5-sata";
 };
 
+&reg_drivevbus {
+	regulator-name = "usb0-vbus";
+	status = "okay";
+};
+
 &reg_eldo3 {
 	regulator-min-microvolt = <1200000>;
 	regulator-max-microvolt = <1200000>;
@@ -333,7 +356,23 @@
 	};
 };
 
+&usb_otg {
+	dr_mode = "otg";
+	status = "okay";
+};
+
+&usb_power_supply {
+	status = "okay";
+};
+
 &usbphy {
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb0_vbus_enable_gpio>;
+
+	usb0_id_det-gpios = <&pio 8 4 GPIO_ACTIVE_HIGH>; /* PI4 */
+	usb0_vbus_det-gpios = <&pio 8 8 GPIO_ACTIVE_HIGH>; /* PI8 */
+	usb0_vbus_power-supply = <&usb_power_supply>;
+	usb0_vbus-supply = <&reg_drivevbus>;
 	usb1_vbus-supply = <&reg_vcc5v0>;
 	usb2_vbus-supply = <&reg_vcc5v0>;
 	status = "okay";
