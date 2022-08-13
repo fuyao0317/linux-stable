@@ -46,16 +46,17 @@
 	leds {
 		compatible = "gpio-leds";
 
-		led-5 { /* this is how the leds are labeled on the board */
-			gpios = <&pio 7 26 GPIO_ACTIVE_LOW>; /* PH26 */
-			color = <LED_COLOR_ID_GREEN>;
+		led-6 {
+			gpios = <&pio 8 15 GPIO_ACTIVE_LOW>; /* PI15 */
+			color = <LED_COLOR_ID_RED>;
 			function = LED_FUNCTION_STATUS;
 		};
 
-		led-6 {
-			gpios = <&pio 8 15 GPIO_ACTIVE_LOW>; /* PI15 */
+		led-5 { /* this is how the leds are labeled on the board */
+			gpios = <&pio 1 11 GPIO_ACTIVE_LOW>; /* PB11 */
 			color = <LED_COLOR_ID_BLUE>;
-			function = LED_FUNCTION_STATUS;
+			function = LED_FUNCTION_HEARTBEAT;
+			linux,default-trigger = "heartbeat";
 		};
 	};
 
@@ -116,6 +117,12 @@
 	hdmi_out_con: endpoint {
 		remote-endpoint = <&hdmi_con_in>;
 	};
+};
+
+&can0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&can_ph_pins>;
+	/* status = "okay"; */
 };
 
 &i2c2 {
@@ -247,4 +254,15 @@
 		vsync-len = <10>;
 	};
 
+};
+
+&codec {
+	allwinner,audio-routing =
+		"Headphone", "HP",
+		"Headphone", "HPCOM",
+		"MIC1", "Mic",
+		"Mic", "MBIAS";
+	allwinner,codec-analog-controls = <&codec_analog>;
+	allwinner,pa = <&pio 1 5 GPIO_ACTIVE_LOW>; // PB5 SPK SHUTDOWN
+	status = "okay";
 };
