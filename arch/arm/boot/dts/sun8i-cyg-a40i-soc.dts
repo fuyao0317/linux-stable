@@ -263,6 +263,6 @@
 		"MIC1", "Mic",
 		"Mic", "MBIAS";
 	allwinner,codec-analog-controls = <&codec_analog>;
-	allwinner,pa = <&pio 1 5 GPIO_ACTIVE_LOW>; // PB5 SPK SHUTDOWN
+	allwinner,pa-gpios = <&pio 1 5 GPIO_ACTIVE_LOW>; // PB5 SPK SHUTDOWN
 	status = "okay";
 };
