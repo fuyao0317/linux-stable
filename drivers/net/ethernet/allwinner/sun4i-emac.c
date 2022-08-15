@@ -30,6 +30,7 @@
 #include <linux/phy.h>
 #include <linux/soc/sunxi/sunxi_sram.h>
 #include <linux/dmaengine.h>
+#include <linux/reset.h>
 
 #include "sun4i-emac.h"
 
@@ -966,6 +967,7 @@ static int emac_probe(struct platform_device *pdev)
 {
 	struct device_node *np = pdev->dev.of_node;
 	struct emac_board_info *db;
+	struct reset_control *rc;
 	struct net_device *ndev;
 	int ret = 0;
 
@@ -1015,6 +1017,11 @@ static int emac_probe(struct platform_device *pdev)
 	if (ret) {
 		dev_err(&pdev->dev, "Error couldn't enable clock (%d)\n", ret);
 		goto out_dispose_mapping;
+	}
+
+	rc = devm_reset_control_get(&pdev->dev, NULL);
+	if (rc) {
+		reset_control_deassert(rc);
 	}
 
 	ret = sunxi_sram_claim(&pdev->dev);
