@@ -261,5 +261,9 @@
 		"Headphone", "Phoneout";
 	allwinner,codec-analog-controls = <&codec_analog>;
 	allwinner,pa-gpios = <&pio 1 5 GPIO_ACTIVE_LOW>; // PB5 SPK SHUTDOWN
-	status = "okay";
+	status = "disabled";
+};
+
+&codec_analog {
+	status = "disabled";
 };
