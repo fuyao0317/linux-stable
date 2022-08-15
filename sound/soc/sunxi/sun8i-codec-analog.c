@@ -662,6 +662,75 @@ static int sun8i_codec_add_mic2(struct snd_soc_component *cmpnt)
 	return 0;
 }
 
+static const DECLARE_TLV_DB_SCALE(sun8i_codec_phoneout_volume, -450, 150, 0);
+
+static const struct snd_kcontrol_new sun8i_codec_phoneout_controls[] = {
+	SOC_SINGLE_TLV("Phoneout Volume", SUN8I_ADDA_PHONEOUT_CTRL,
+		       SUN8I_ADDA_PHONEOUT_CTRL_PHONEOUTG, 0x07, 0,
+		       sun8i_codec_phoneout_volume),
+};
+
+static const struct snd_kcontrol_new sun8i_codec_ph_source_control[] = {
+	SOC_DAPM_SINGLE("Left Mixer Switch", SUN8I_ADDA_PHONEOUT_CTRL,
+			SUN8I_ADDA_PHONEOUT_CTRL_PHONEOUT_LMIX, 1, 0),
+	SOC_DAPM_SINGLE("Right Mixer Switch", SUN8I_ADDA_PHONEOUT_CTRL,
+			SUN8I_ADDA_PHONEOUT_CTRL_PHONEOUT_RMIX, 1, 0),
+	SOC_DAPM_SINGLE("Mic1 Switch", SUN8I_ADDA_PHONEOUT_CTRL,
+			SUN8I_ADDA_PHONEOUT_CTRL_PHONEOUT_MIC1, 1, 0),
+	SOC_DAPM_SINGLE("Mic2 Switch", SUN8I_ADDA_PHONEOUT_CTRL,
+			SUN8I_ADDA_PHONEOUT_CTRL_PHONEOUT_MIC2, 1, 0),
+};
+static const struct snd_kcontrol_new sun8i_codec_phe_control =
+	SOC_DAPM_SINGLE("Switch", SUN8I_ADDA_PHONEOUT_CTRL,
+			SUN8I_ADDA_PHONEOUT_CTRL_PHONEOUTEN, 1, 0);
+
+static const struct snd_soc_dapm_widget sun8i_codec_phoneout_widgets[] = {
+	SND_SOC_DAPM_MIXER("Phoneout Source", SND_SOC_NOPM, 0, 0,
+			   sun8i_codec_ph_source_control,
+			   ARRAY_SIZE(sun8i_codec_ph_source_control)),
+	SND_SOC_DAPM_SWITCH("Phoneout Enable", SND_SOC_NOPM, 0, 0,
+			    &sun8i_codec_phe_control),
+	SND_SOC_DAPM_OUTPUT("Phoneout"),
+};
+
+static const struct snd_soc_dapm_route sun8i_codec_phoneout_routes[] = {
+	{ "Phoneout Source", "Left Mixer Switch", "Left Mixer" },
+	{ "Phoneout Source", "Right Mixer Switch", "Right Mixer" },
+	{ "Phoneout Enable", "Switch", "Phoneout Source" },
+	{ "Phoneout", NULL, "Phoneout Enable" },
+};
+
+static int sun8i_codec_add_phoneout(struct snd_soc_component * cmpnt)
+{
+	struct snd_soc_dapm_context *dapm = snd_soc_component_get_dapm(cmpnt);
+	struct device *dev = cmpnt->dev;
+	int ret;
+
+	ret = snd_soc_add_component_controls(cmpnt,
+					     sun8i_codec_phoneout_controls,
+					     ARRAY_SIZE(sun8i_codec_phoneout_controls));
+	if (ret) {
+		dev_err(dev, "Failed to add phoneout controls: %d\n", ret);
+		return ret;
+	}
+
+	ret = snd_soc_dapm_new_controls(dapm, sun8i_codec_phoneout_widgets,
+					ARRAY_SIZE(sun8i_codec_phoneout_widgets));
+	if (ret) {
+		dev_err(dev, "Failed to add phoneout DAPM widgets: %d\n", ret);
+		return ret;
+	}
+
+	ret = snd_soc_dapm_add_routes(dapm, sun8i_codec_phoneout_routes,
+				      ARRAY_SIZE(sun8i_codec_phoneout_routes));
+	if (ret) {
+		dev_err(dev, "Failed to add phoneout DAPM routes: %d\n", ret);
+		return ret;
+	}
+
+	return 0;
+}
+
 struct sun8i_codec_analog_quirks {
 	bool has_headphone;
 	bool has_hmic;
@@ -669,6 +738,7 @@ struct sun8i_codec_analog_quirks {
 	bool has_lineout;
 	bool has_mbias;
 	bool has_mic2;
+	bool has_phoneout;
 };
 
 static const struct sun8i_codec_analog_quirks sun8i_a23_quirks = {
@@ -684,6 +754,14 @@ static const struct sun8i_codec_analog_quirks sun8i_h3_quirks = {
 	.has_lineout	= true,
 	.has_mbias	= true,
 	.has_mic2	= true,
+};
+
+static const struct sun8i_codec_analog_quirks sun8i_r40_quirks = {
+	.has_linein	= true,
+	.has_lineout	= true,
+	.has_mbias	= true,
+	.has_mic2	= true,
+	.has_phoneout   = true,
 };
 
 static int sun8i_codec_analog_add_mixer(struct snd_soc_component *cmpnt,
@@ -787,6 +865,12 @@ static int sun8i_codec_analog_cmpnt_probe(struct snd_soc_component *cmpnt)
 			return ret;
 	}
 
+	if (quirks->has_phoneout) {
+		ret = sun8i_codec_add_phoneout(cmpnt);
+		if (ret)
+			return ret;
+	}
+
 	return 0;
 }
 
@@ -808,6 +892,10 @@ static const struct of_device_id sun8i_codec_analog_of_match[] = {
 	{
 		.compatible = "allwinner,sun8i-h3-codec-analog",
 		.data = &sun8i_h3_quirks,
+	},
+	{
+		.compatible = "allwinner,sun8i-r40-codec-analog",
+		.data = &sun8i_r40_quirks,
 	},
 	{
 		.compatible = "allwinner,sun8i-v3s-codec-analog",
