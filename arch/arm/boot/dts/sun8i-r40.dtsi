@@ -342,6 +342,7 @@
 		codec_analog: codec-analog@1c22f00 {
 			compatible = "allwinner,sun8i-r40-codec-analog";
 			reg = <0x01c22f00 0x4>;
+			status = "disabled";
 		};
 
 		video-codec@1c0e000 {
