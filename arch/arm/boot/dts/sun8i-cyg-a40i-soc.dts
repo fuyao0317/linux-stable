@@ -73,6 +73,11 @@
 		clocks = <&ccu CLK_OUTA>;
 		clock-names = "ext_clock";
 	};
+
+	beep: beep {
+		compatible = "gpio-beeper";
+		gpios = <&pio 3 16 GPIO_ACTIVE_HIGH>; //PD16
+	};
 };
 
 &ahci {
@@ -261,9 +266,9 @@
 		"Headphone", "Phoneout";
 	allwinner,codec-analog-controls = <&codec_analog>;
 	allwinner,pa-gpios = <&pio 1 5 GPIO_ACTIVE_LOW>; // PB5 SPK SHUTDOWN
-	status = "disabled";
+	status = "okay";
 };
 
 &codec_analog {
-	status = "disabled";
+	status = "okay";
 };
