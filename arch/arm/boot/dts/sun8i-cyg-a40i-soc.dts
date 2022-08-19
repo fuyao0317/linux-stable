@@ -79,10 +79,11 @@
 		gpios = <&pio 3 16 GPIO_ACTIVE_HIGH>; //PD16
 	};
 
-	backlight: lvds-backlight {
+	lvds_backlight: lvds-backlight {
 		compatible = "pwm-backlight";
 		pwms = <&pwm 0 5000000 0>;
 		pwm-names = "backlight";
+		enable-gpios = <&pio 3 22 GPIO_ACTIVE_HIGH>;
 		brightness-levels = <0 100>;
 		num-interpolated-steps = <100>;
 		default-brightness-level = <80>;
@@ -254,7 +255,7 @@
 	width-mm = <246>;
 	height-mm = <184>;
 	data-mapping = "vesa-24";
-	enable-gpios = <&pio 3 22 GPIO_ACTIVE_HIGH>;
+	backlight = <&lvds_backlight>;
 
 	panel-timing {
 		clock-frequency = <65000000>;
