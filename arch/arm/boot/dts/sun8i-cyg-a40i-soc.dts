@@ -78,6 +78,15 @@
 		compatible = "gpio-beeper";
 		gpios = <&pio 3 16 GPIO_ACTIVE_HIGH>; //PD16
 	};
+
+	backlight: lvds-backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pwm 0 5000000 0>;
+		pwm-names = "backlight";
+		brightness-levels = <0 100>;
+		num-interpolated-steps = <100>;
+		default-brightness-level = <80>;
+	};
 };
 
 &ahci {
@@ -270,5 +279,11 @@
 };
 
 &codec_analog {
+	status = "okay";
+};
+
+&pwm {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pwm_ch0_pin>;
 	status = "okay";
 };
