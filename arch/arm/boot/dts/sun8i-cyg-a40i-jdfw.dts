@@ -46,12 +46,6 @@
 	leds {
 		compatible = "gpio-leds";
 
-		led-6 {
-			gpios = <&pio 8 15 GPIO_ACTIVE_LOW>; /* PI15 */
-			color = <LED_COLOR_ID_RED>;
-			function = LED_FUNCTION_STATUS;
-		};
-
 		led-5 { /* this is how the leds are labeled on the board */
 			gpios = <&pio 1 11 GPIO_ACTIVE_LOW>; /* PB11 */
 			color = <LED_COLOR_ID_BLUE>;
@@ -225,27 +219,6 @@
 &usbphy {
 	usb1_vbus-supply = <&reg_vcc5v0>;
 	usb2_vbus-supply = <&reg_vcc5v0>;
-	status = "okay";
-};
-
-&emac {
-	pinctrl-0 = <&emac_ph_pins>;
-	pinctrl-names = "default";
-	phy-handle = <&phy2>;
-	status = "okay";
-};
-
-&emac_mdio {
-	status = "okay";
-	reset-gpios = <&pio 1 9 GPIO_ACTIVE_LOW>; // PB9 MII_RESET
-	reset-delay-us = <10000>;
-	phy2: ethernet-phy@3 {
-		compatible = "ethernet-phy-ieee802.3-c22";
-		reg = <3>;
-	};
-};
-
-&emac_sram {
 	status = "okay";
 };
 
