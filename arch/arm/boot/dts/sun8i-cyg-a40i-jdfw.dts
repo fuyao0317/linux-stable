@@ -11,7 +11,7 @@
 #include <dt-bindings/leds/common.h>
 
 / {
-	model = "Cyg A40i SOC";
+	model = "Cyg A40i JDFW";
 	compatible = "forlinx,oka40i-c", "forlinx,feta40i-c", "allwinner,sun8i-r40";
 
 	aliases {
@@ -70,7 +70,7 @@
 
 	beep: beep {
 		compatible = "gpio-beeper";
-		gpios = <&pio 3 16 GPIO_ACTIVE_HIGH>; //PD16
+		gpios = <&pio 1 12 GPIO_ACTIVE_HIGH>;
 	};
 
 	lvds_backlight: lvds-backlight {
@@ -136,6 +136,11 @@
 
 &i2c2 {
 	status = "okay";
+
+	rtc_bm8563: rtc-bm8563@51 {
+		compatible = "nxp,pcf8563";
+		reg = <0x51>;
+	};
 };
 
 &mmc0 {
