@@ -142,6 +142,11 @@
 
 &i2c2 {
 	status = "okay";
+
+	rtc_bm8563: rtc-bm8563@51 {
+		compatible = "nxp,pcf8563";
+		reg = <0x51>;
+	};
 };
 
 &mmc0 {
