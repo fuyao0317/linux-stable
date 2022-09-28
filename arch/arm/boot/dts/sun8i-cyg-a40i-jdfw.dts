@@ -82,6 +82,13 @@
 		num-interpolated-steps = <100>;
 		default-brightness-level = <80>;
 	};
+
+	rfid_em4095: em4095RFID {
+		compatible = "em4095RFID-V1";
+		rfid_shd-gpios = <&pio 3 11 GPIO_ACTIVE_HIGH>;
+		rfid_demod_out-gpios = <&pio 3 12 GPIO_ACTIVE_HIGH>;
+
+	};
 };
 
 &ahci {

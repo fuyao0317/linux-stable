@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# cyg config support
+#
+
+menuconfig CYG_DRIVER
+	bool
+	default y
+	prompt "CYG Driver Support"
+
+if CYG_DRIVER
+
+comment "THIS IS ALL DEFAULT YES SO NO DEFCONFIG NEED CHANGE"
+
+config CYG_EM4095RFID_V1
+	tristate "CYG RFID v1 support"
+	default y
+	help
+	  cyg 4095 driver, a misc driver support read.
+
+
+endif
