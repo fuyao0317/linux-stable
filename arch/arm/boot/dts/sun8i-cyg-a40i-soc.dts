@@ -96,6 +96,19 @@
 	status = "okay";
 };
 
+&ehci0 {
+	status = "okay";
+};
+
+&ohci0 {
+	status = "okay";
+};
+
+&usb_otg {
+	dr_mode = "peripheral";
+	status = "okay";
+};
+
 &de {
 	status = "okay";
 };
