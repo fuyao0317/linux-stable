@@ -18,5 +18,10 @@ config CYG_EM4095RFID_V1
 	help
 	  cyg 4095 driver, a misc driver support read.
 
+config CYG_RFID_NETLINK
+	tristate "CYG RFID netlink support"
+	default n
+	help
+	  netlink rfid support.
 
 endif
