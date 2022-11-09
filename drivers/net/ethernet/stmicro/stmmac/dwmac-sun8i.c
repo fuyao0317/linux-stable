@@ -126,6 +126,7 @@ static const struct emac_variant emac_variant_r40 = {
 	.support_mii = true,
 	.support_rgmii = true,
 	.rx_delay_max = 7,
+	.tx_delay_max = 7,
 };
 
 static const struct emac_variant emac_variant_a64 = {
