@@ -127,6 +127,8 @@
 	phy-handle = <&phy1>;
 	phy-mode = "rgmii-id";
 	phy-supply = <&reg_dcdc1>;
+	allwinner,tx-delay-ps = <300>;
+	allwinner,rx-delay-ps = <200>;
 	status = "okay";
 };
 
