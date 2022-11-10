@@ -114,6 +114,8 @@
 	pinctrl-0 = <&gmac_rgmii_pins>;
 	phy-handle = <&phy1>;
 	phy-mode = "rgmii-id";
+	allwinner,tx-delay-ps = <300>;
+	allwinner,rx-delay-ps = <200>;
 	phy-supply = <&reg_dcdc1>;
 	status = "okay";
 };
