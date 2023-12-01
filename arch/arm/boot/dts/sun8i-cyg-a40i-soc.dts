@@ -32,7 +32,7 @@
 		stdout-path = "serial0:115200n8";
 	};
 
-	connector {
+	hdmi-connector {
 		compatible = "hdmi-connector";
 		type = "a";
 
@@ -69,47 +69,65 @@
 
 	wifi_pwrseq: wifi_pwrseq {
 		compatible = "mmc-pwrseq-simple";
-		reset-gpios = <&pio 1 10 GPIO_ACTIVE_LOW>; // PB10 WIFI_EN
+		reset-gpios = <&pio 4 8 GPIO_ACTIVE_LOW>; // PE08 WIFI_EN
 		clocks = <&ccu CLK_OUTA>;
 		clock-names = "ext_clock";
 	};
 
 	beep: beep {
 		compatible = "gpio-beeper";
-		gpios = <&pio 3 16 GPIO_ACTIVE_HIGH>; //PD16
+		gpios = <&pio 1 3 GPIO_ACTIVE_HIGH>;
 	};
 
 	lvds_backlight: lvds-backlight {
 		compatible = "pwm-backlight";
 		pwms = <&pwm 0 5000000 0>;
 		pwm-names = "backlight";
-		enable-gpios = <&pio 3 22 GPIO_ACTIVE_HIGH>;
+		enable-gpios = <&pio 1 4 GPIO_ACTIVE_HIGH>;
 		brightness-levels = <0 100>;
 		num-interpolated-steps = <100>;
 		default-brightness-level = <80>;
 	};
-};
 
+	watchdog_gpio:watchdog-gpio {
+		/* SGM823 */
+		compatible = "linux,wdt-gpio";
+		gpios = <&pio 3 10 GPIO_ACTIVE_LOW>;
+		hw_algo = "toggle";
+		hw_margin_ms = <1600>;
+		//always-running = "true";
+	};
+	
+	em4095rfid:em4095RFID {
+		compatible = "em4095RFID";
+		pinctrl-names = "default";
+		pinctrl-0 = <&rfid_pins_out>,<&rfid_pins_in>;
+		shd = <&pio 3 11 GPIO_ACTIVE_HIGH>;
+		demod_out = <&pio 3 12 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+};
+&pio {
+	rfid_pins_out:rfid-pins-out{
+		pins = "PD11";
+		function = "gpio_out";
+	};
+	rfid_pins_in:rfid-pins-in{
+		pins =  "PD12";
+		function = "gpio_in";
+	};
+};
 &ahci {
 	ahci-supply = <&reg_dldo4>;
 	phy-supply = <&reg_eldo2>;
 	status = "okay";
 };
 
-&ehci0 {
-	status = "okay";
-};
-
-&ohci0 {
-	status = "okay";
-};
-
-&usb_otg {
-	dr_mode = "peripheral";
-	status = "okay";
-};
-
 &de {
+	status = "okay";
+};
+
+&ehci0 {
 	status = "okay";
 };
 
@@ -155,15 +173,35 @@
 	/* status = "okay"; */
 };
 
-&i2c2 {
+&i2c1 {
 	status = "okay";
-
-	rtc_bm8563: rtc-bm8563@51 {
-		compatible = "nxp,pcf8563";
-		reg = <0x51>;
+	
+	fm17550:fm17550@28{
+ 		compatible = "fm17550";
+	 	reg = <0x28>;
 	};
 };
 
+&i2c2 {
+	status = "okay";
+	
+	rtc_3078:rtc-3078@32{
+ 		compatible = "whwave,sd3078";
+	 	reg = <0x32>;
+	};
+	
+	eeprom_24c04:eeprom-24c04@50 {
+		compatible = "atmel,24c512";
+		pagesize = <128>;
+		reg = <0x50>;
+	};
+};
+&i2c3 {
+	status = "okay";
+};
+&i2c4 {
+	status = "okay";
+};
 &mmc0 {
 	vmmc-supply = <&reg_dcdc1>;
 	vqmmc-supply = <&reg_dcdc1>;
@@ -171,12 +209,33 @@
 	cd-gpios = <&pio 8 11 GPIO_ACTIVE_LOW>; // PI11
 	status = "okay";
 };
+&mmc1 {
+	mmc-pwrseq = <&wifi_pwrseq>;
+	bus-width = <4>;
+	vmmc-supply = <&reg_dldo1>;
+	vqmmc-supply = <&reg_dldo1>;
+	non-removable;
+	wakeup-source;
+	keep-power-in-suspend;
+	status = "okay";
 
+	brcmf: wifi@1 {
+		reg = <1>;
+		compatible = "brcm,bcm4329-fmac";
+		interrupt-parent = <&pio>;
+		interrupts = <7 1 IRQ_TYPE_LEVEL_LOW>; /* PH1 WL_WAKE_UP */
+		interrupt-names = "host-wake";
+	};
+};
 &mmc3 {
 	vmmc-supply = <&reg_dcdc1>;
 	vqmmc-supply = <&reg_dcdc1>;
 	bus-width = <4>;
 	cd-gpios = <&pio 8 10 GPIO_ACTIVE_LOW>; // PI10
+	status = "disabled";
+};
+
+&ohci0 {
 	status = "okay";
 };
 
@@ -222,6 +281,18 @@
 	pinctrl-0 = <&uart3_pg_pins>, <&uart3_rts_cts_pg_pins>;
 	uart-has-rtscts;
 	status = "okay";
+	bluetooth {
+		compatible = "brcm,bcm43438-bt";
+		clocks = <&ccu CLK_OUTA>;
+		clock-names = "lpo";
+		vbat-supply = <&reg_dldo1>;
+		vddio-supply = <&reg_dldo1>;
+		device-wakeup-gpios = <&pio 0 17 GPIO_ACTIVE_HIGH>; /* PA17 */
+		host-wakeup-gpios = <&pio 8 13 GPIO_ACTIVE_HIGH>; /* PI13 */
+		shutdown-gpios = <&pio 7 12 GPIO_ACTIVE_HIGH>; /* PH12 */
+		
+		max-speed = <115200>;
+	};
 };
 
 &uart4 {
@@ -243,8 +314,14 @@
 };
 
 &usbphy {
+	usb_vbus-supply = <&reg_vcc5v0>;
 	usb1_vbus-supply = <&reg_vcc5v0>;
 	usb2_vbus-supply = <&reg_vcc5v0>;
+	status = "okay";
+};
+
+&usb_otg {
+	dr_mode = "host";
 	status = "okay";
 };
 
@@ -305,6 +382,47 @@
 
 &pwm {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pwm_ch0_pin>;
+	pinctrl-0 = <&pwm_ch0_pin>,<&pwm_ch1_pin>;
 	status = "okay";
+};
+
+&spi0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi0_pc_pins>, <&spi0_cs0_pc_pin>;
+	status = "okay";
+
+	spidev@0 {
+		compatible = "cyg,spi-dev";
+		reg = <0>;
+		spi-max-frequency = <8000000>;
+	};
+};
+&spi2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi2_pi_pins>,<&spi2_cs0_pi_pin>,<&spi2_cs1_pi_pin>;
+	status = "okay";
+
+	can@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "microchip,mcp2515";
+		reg = <0>;
+		mode=<0>;
+		clocks = <&osc8M>;
+		interrupt-parent = <&pio>;
+		interrupts = <7 0 IRQ_TYPE_EDGE_FALLING>; /* PH0 */
+		spi-max-frequency = <10000000>;
+	};
+	can@1 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "microchip,mcp2515";
+		reg = <1>;
+		mode=<0>;
+		clocks = <&osc8M>;
+		interrupt-parent = <&pio>;
+		interrupts = <7 4 IRQ_TYPE_EDGE_FALLING>; /* PH4*/
+		spi-max-frequency = <10000000>;
+	};
+
 };

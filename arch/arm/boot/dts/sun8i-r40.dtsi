@@ -60,6 +60,14 @@
 		#size-cells = <1>;
 		ranges;
 
+		osc8M: osc8M {
+			#clock-cells = <0>;
+			compatible = "fixed-clock";
+			clock-frequency = <8000000>;
+			clock-accuracy = <50000>;
+			clock-output-names = "osc8M";
+		};
+
 		osc24M: osc24M {
 			#clock-cells = <0>;
 			compatible = "fixed-clock";
@@ -456,19 +464,19 @@
 		};
 
 		usb_otg: usb@1c13000 {
-			compatible = "allwinner,sun8i-r40-musb",
-				     "allwinner,sun8i-h3-musb";
+			compatible = "allwinner,sun8i-r40-musb";
 			reg = <0x01c13000 0x0400>;
 			clocks = <&ccu CLK_BUS_OTG>;
 			resets = <&ccu RST_BUS_OTG>;
 			interrupts = <GIC_SPI 38 IRQ_TYPE_LEVEL_HIGH>;
 			interrupt-names = "mc";
+			host-controllers = <&ehci0>, <&ohci0>;
 			phys = <&usbphy 0>;
 			phy-names = "usb";
 			extcon = <&usbphy 0>;
-			dr_mode = "otg";
 			status = "disabled";
 		};
+
 
 		usbphy: phy@1c13400 {
 			compatible = "allwinner,sun8i-r40-usb-phy";
@@ -492,16 +500,20 @@
 			reset-names = "usb0_reset",
 				      "usb1_reset",
 				      "usb2_reset";
+			port0-host-controllers = <&ehci0>, <&ohci0>;
+			port0-peripheral-controllers = <&usb_otg>;
 			status = "disabled";
 			#phy-cells = <1>;
 		};
-
 		ehci0: usb@1c14000 {
 			compatible = "allwinner,sun8i-r40-ehci", "generic-ehci";
 			reg = <0x01c14000 0x100>;
 			interrupts = <GIC_SPI 39 IRQ_TYPE_LEVEL_HIGH>;
-			clocks = <&ccu CLK_BUS_EHCI0>, <&ccu CLK_BUS_OHCI0>;
-			resets = <&ccu RST_BUS_EHCI0>, <&ccu RST_BUS_OHCI0>;
+			clocks = <&ccu CLK_BUS_EHCI0>;
+			resets = <&ccu RST_BUS_EHCI0>;
+			companion = <&ohci0>;
+			phys = <&usbphy 0>;
+			phy-names = "usb";
 			status = "disabled";
 		};
 
@@ -509,9 +521,11 @@
 			compatible = "allwinner,sun8i-r40-ohci", "generic-ohci";
 			reg = <0x01c14400 0x100>;
 			interrupts = <GIC_SPI 40 IRQ_TYPE_LEVEL_HIGH>;
-			clocks = <&ccu CLK_BUS_EHCI0>, <&ccu CLK_BUS_OHCI0>,
+			clocks = <&ccu CLK_BUS_OHCI0>,
 				 <&ccu CLK_USB_OHCI0>;
-			resets = <&ccu RST_BUS_EHCI0>, <&ccu RST_BUS_OHCI0>;
+			resets = <&ccu RST_BUS_OHCI0>;
+			phys = <&usbphy 0>;
+			phy-names = "usb";
 			status = "disabled";
 		};
 
@@ -796,6 +810,23 @@
 			};
 
 			/omit-if-no-ref/
+			spi2_pi_pins: spi2-pi-pins {
+				pins = "PC20", "PC21", "PC22";
+				function = "spi2";
+			};
+			/omit-if-no-ref/
+			spi2_cs0_pi_pin: spi2-cs0-pi-pin {
+				pins = "PC19";
+				function = "spi2";
+			};
+
+			/omit-if-no-ref/
+			spi2_cs1_pi_pin: spi2-cs1-pi-pin {
+				pins = "PB13";
+				function = "spi2";
+			};
+
+			/omit-if-no-ref/
 			uart0_pb_pins: uart0-pb-pins {
 				pins = "PB22", "PB23";
 				function = "uart0";
@@ -852,6 +883,11 @@
 			/omit-if-no-ref/
 			pwm_ch0_pin: pwm-ch0-pin {
 				pins = "PB2";
+				function = "pwm";
+			};
+			
+			pwm_ch1_pin: pwm-ch1-pin {
+				pins = "PB3";
 				function = "pwm";
 			};
 		};
