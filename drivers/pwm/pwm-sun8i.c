@@ -258,7 +258,7 @@ static int sun8i_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 	return 0;
 }
 
-static void sun8i_pwm_get_state(struct pwm_chip *chip, struct pwm_device *pwm,
+static int sun8i_pwm_get_state(struct pwm_chip *chip, struct pwm_device *pwm,
 		struct pwm_state *state)
 {
 	struct sun8i_pwm_chip *sun8i_pwm = to_sun8i_pwm_chip(chip);
@@ -294,6 +294,8 @@ static void sun8i_pwm_get_state(struct pwm_chip *chip, struct pwm_device *pwm,
 	state->duty_cycle = DIV_ROUND_CLOSEST_ULL(tmp, clk_rate);
 	tmp = clk_div * prescal * div_m_table[id] * NSEC_PER_SEC;
 	state->period = DIV_ROUND_CLOSEST_ULL(tmp, clk_rate);
+
+	return 0;
 }
 
 static const struct regmap_config sun8i_pwm_regmap_config = {
