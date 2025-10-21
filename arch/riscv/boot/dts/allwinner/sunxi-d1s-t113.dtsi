@@ -143,6 +143,13 @@
 				pins = "PB6", "PB7";
 				function = "uart3";
 			};
+
+			/omit-if-no-ref/
+			rmii_pg_pins: rmii-pg-pins {
+				pins = "PG0", "PG1", "PG2", "PG3", "PG4",
+				       "PG5", "PG12", "PG13", "PG14", "PG15";
+				function = "emac";
+			};
 		};
 
 		ccu: clock-controller@2001000 {
