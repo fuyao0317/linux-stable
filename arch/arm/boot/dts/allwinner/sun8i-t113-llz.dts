@@ -208,3 +208,24 @@
 	status = "okay";
 };
 
+/*
+* - HP
+* - LINEIN
+* - MIC3
+* - MBIAS
+* - Headphone
+* - Headset Mic
+* - Line In
+* - Line Out
+* - Mic
+* - Speaker
+*/
+&codec {
+	status = "okay";
+	allwinner,audio-routing =
+		"Headphone","HP";
+};
+
+&codec_analog {
+	status = "okay";
+};
