@@ -66,9 +66,21 @@
 	};
 };
 
+&uart0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart0_pe_pins>;
+	status = "okay";
+};
+
 &uart1 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&uart1_pg6_pins>;
+	pinctrl-0 = <&uart1_pe_pins>;
+	status = "okay";
+};
+
+&uart4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart4_pe_pins>;
 	status = "okay";
 };
 
@@ -77,7 +89,6 @@
 	pinctrl-0 = <&uart3_pc_pins>;
 	status = "okay";
 };
-
 &uart5 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart5_pb_pins>;
@@ -91,19 +102,40 @@
 		function = "uart3";
 	};
 
+	/omit-if-no-ref/
 	uart5_pb_pins: uart5-pb-pins {
 		pins = "PB4", "PB5";
 		function = "uart5";
 	};
 
+	/omit-if-no-ref/
 	i2c2_pe_pins: i2c2-pe-pins {
 		pins = "PE12", "PE13";
 		function = "i2c2";
 	};
 
+	/omit-if-no-ref/
 	pwm7_pins: pwm7-pins {
 		pins = "PD22";
 		function = "pwm7";
+	};
+
+	/omit-if-no-ref/
+	uart0_pe_pins: uart0-pe-pins {
+		pins = "PE2", "PE3";
+		function = "uart0";
+	};
+
+	/omit-if-no-ref/
+	uart1_pe_pins: uart1-pe-pins {
+		pins = "PE10", "PE11";
+		function = "uart1";
+	};
+
+	/omit-if-no-ref/
+	uart4_pe_pins: uart4-pe-pins {
+		pins = "PE4", "PE5";
+		function = "uart4";
 	};
 };
 
@@ -223,7 +255,10 @@
 &codec {
 	status = "okay";
 	allwinner,audio-routing =
-		"Headphone","HP";
+		"Headphone","HP",
+		"Speaker", "HP";
+
+	allwinner,pa-gpios = <&pio 6 10 GPIO_ACTIVE_HIGH>;
 };
 
 &codec_analog {
