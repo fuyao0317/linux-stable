@@ -371,14 +371,16 @@ static int misc4095RFID_probe(struct platform_device *dev)
 
 	misc4095RFID.rfid_shd =
 		devm_gpiod_get(&dev->dev, "rfid_shd", GPIOD_OUT_HIGH);
-	if (misc4095RFID.rfid_shd < 0) {
-		dev_err(&dev->dev, "can't get rfid_shd");
+	if (IS_ERR(misc4095RFID.rfid_shd)) {
+		dev_err(&dev->dev, "can't get rfid_shd %ld",
+			PTR_ERR(misc4095RFID.rfid_shd));
 		return -EINVAL;
 	}
 	misc4095RFID.rfid_demod_out =
 		devm_gpiod_get(&dev->dev, "rfid_demod_out", 0);
-	if (misc4095RFID.rfid_demod_out < 0) {
-		dev_err(&dev->dev, "can't get rfid_demod_out");
+	if (IS_ERR(misc4095RFID.rfid_demod_out)) {
+		dev_err(&dev->dev, "can't get rfid_demod_out %ld",
+			PTR_ERR(misc4095RFID.rfid_demod_out));
 		return -EINVAL;
 	}
 
