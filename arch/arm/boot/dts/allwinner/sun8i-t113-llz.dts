@@ -18,7 +18,7 @@
 	};
 
 	aliases {
-		ethernet0 = &rtl8189ftv;
+		/* ethernet0 = &rtl8189ftv; */
 		serial0 = &uart0;
 		serial1 = &uart1;
 		serial2 = &uart2;
@@ -30,7 +30,24 @@
 		watchdog1 = &wdt;
 	};
 
-	/delete-node/ leds;
+	leds {
+		/delete-node/ led-0;
+
+		led-0 {
+			gpios = <&pio 3 13 GPIO_ACTIVE_HIGH>;
+			color = <LED_COLOR_ID_RED>;
+			function = LED_FUNCTION_HEARTBEAT;
+			linux,default-trigger = "heartbeat";
+		};
+	};
+
+	rfkill_wifi {
+		compatible = "rfkill-gpio";
+		label = "rfill-sdio-wlan";
+		radio-type = "wlan";
+		shutdown-gpios = <&pio 6 14 GPIO_ACTIVE_HIGH>;
+	};
+
 };
 
 &cpu0 {
@@ -41,8 +58,23 @@
 	cpu-supply = <&reg_vcc_core>;
 };
 
+&spi0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi0_pins>;
+	status = "okay";
+
+	spinand0: spinand@0 {
+		compatible = "spi-nand";
+		reg = <0>;
+		status = "okay";
+	};
+};
+
 &mmc1 {
-	rtl8189ftv: wifi@1 {
+	/delete-property/ mmc-pwrseq;
+
+	ap6212: wifi@1 {
+		compatible = "ap6212";
 		reg = <1>;
 		interrupt-parent = <&pio>;
 		interrupts = <6 10 IRQ_TYPE_LEVEL_LOW>; /* PG10 = WL_WAKE_AP */
@@ -52,7 +84,7 @@
 
 &emac {
 	pinctrl-names = "default";
-	pinctrl-0 = <&rmii_pg_pins>;
+	pinctrl-0 = <&rmii_pe_pins>;
 	status = "okay";
 	phy-mode = "rmii";
 	phy-handle = <&ext_rmii_phy1>;
@@ -66,27 +98,15 @@
 	};
 };
 
-&uart0 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&uart0_pe_pins>;
-	status = "okay";
-};
-
-&uart1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&uart1_pe_pins>;
-	status = "okay";
-};
-
 &uart4 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&uart4_pe_pins>;
+	pinctrl-0 = <&uart4_pb_pins>;
 	status = "okay";
 };
 
 &uart3 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&uart3_pc_pins>;
+	pinctrl-0 = <&uart3_pb_pins>;
 	status = "okay";
 };
 &uart5 {
@@ -97,9 +117,15 @@
 
 &pio {
 	/omit-if-no-ref/
-	uart3_pc_pins: uart3-pc-pins {
-		pins = "PC6", "PC7";
+	uart3_pb_pins: uart3-pb-pins {
+		pins = "PB6", "PB7";
 		function = "uart3";
+	};
+
+	/omit-if-no-ref/
+	uart4_pb_pins: uart5-pb-pins {
+		pins = "PB2", "PB3";
+		function = "uart4";
 	};
 
 	/omit-if-no-ref/
@@ -139,6 +165,9 @@
 	};
 };
 
+&rtc {
+	status = "disabled";
+};
 &wdt {
 	status = "okay";
 };
@@ -227,12 +256,17 @@
 		compatible = "goodix,gt911";
 		reg = <0x14>;
 		interrupt-parent = <&pio>;
-		irq-gpios = <&pio 1 6 GPIO_ACTIVE_HIGH>;
+		irq-gpios = <&pio 4 10 GPIO_ACTIVE_HIGH>;
 		touchscreen-size-x = <1024>;
 		touchscreen-size-y = <600>;
-		interrupts = <1 6 IRQ_TYPE_EDGE_FALLING>;
-		reset-gpios = <&pio 1 7 GPIO_ACTIVE_HIGH>;
+		interrupts = <4 10 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpios = <&pio 4 11 GPIO_ACTIVE_HIGH>;
 		wakeup-source;
+	};
+
+	aip8563: aip8563@51 {
+		compatible = "nxp,pcf8563","aiptek,aip8563";
+		reg = <0x51>;
 	};
 };
 
