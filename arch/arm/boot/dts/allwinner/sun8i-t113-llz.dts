@@ -109,9 +109,20 @@
 	pinctrl-0 = <&uart3_pb_pins>;
 	status = "okay";
 };
+
 &uart5 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart5_pb_pins>;
+	status = "okay";
+};
+
+&uart1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart1_pg_pins>;
+	rts-gpios = <&pio 6 9 GPIO_ACTIVE_LOW>;
+	/* rs485-rts-active-low; */
+	linux,rs485-enabled-at-boot-time;
+	/* rs485-rts-delay = <1 1>; */
 	status = "okay";
 };
 
@@ -122,8 +133,13 @@
 		function = "uart3";
 	};
 
+	uart1_pg_pins: uart1-pg-pins {
+		pins = "PG6", "PG7";
+		function = "uart1";
+	};
+
 	/omit-if-no-ref/
-	uart4_pb_pins: uart5-pb-pins {
+	uart4_pb_pins: uart4-pb-pins {
 		pins = "PB2", "PB3";
 		function = "uart4";
 	};
