@@ -225,12 +225,17 @@ static int dw8250_rs485_config(struct uart_port *p, struct ktermios *termios,
  */
 static bool dw8250_detect_rs485_hw(struct uart_port *p)
 {
+#define DW8250_ALWAYS_USE_SOFTWARE
+#ifdef DW8250_ALWAYS_USE_SOFTWARE
+	return false;
+#else
 	u32 reg;
 
 	dw8250_writel_ext(p, DW_UART_RE_EN, 1);
 	reg = dw8250_readl_ext(p, DW_UART_RE_EN);
 	dw8250_writel_ext(p, DW_UART_RE_EN, 0);
 	return reg;
+#endif
 }
 
 static const struct serial_rs485 dw8250_rs485_supported = {
