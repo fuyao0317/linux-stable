@@ -14,7 +14,8 @@
 
 	chosen {
 		stdout-path = "serial3:115200n8";
-		bootargs = "root=/dev/mmcblk0p2 rootwait rw";
+		/* bootargs = "root=/dev/mmcblk0p2 rootwait rw"; */
+		bootargs = "ubi.mtd=system  root=ubi0:rootfs rootfstype=ubifs rootwait rw";
 	};
 
 	aliases {
@@ -79,8 +80,13 @@
 			};
 
 			partition@100000 {
+				label = "boot";
+				reg = <0x100000 0x1400000>;
+			};
+
+			partition@1500000 {
 				label = "system";
-				reg = <0x100000 0xff00000>;
+				reg = <0x1500000 0xeb00000>;
 			};
 		};
 	};
