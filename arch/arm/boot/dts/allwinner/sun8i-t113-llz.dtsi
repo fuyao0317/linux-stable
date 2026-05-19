@@ -3,19 +3,14 @@
 
 #include <dt-bindings/interrupt-controller/irq.h>
 
-/dts-v1/;
-
 #include "sun8i-t113s.dtsi"
 #include "sunxi-d1s-t113-mangopi-mq-r.dtsi"
 
 / {
-	model = "LLZ T113 V1";
 	compatible = "widora,mangopi-mq-r-t113", "allwinner,sun8i-t113s";
 
 	chosen {
 		stdout-path = "serial3:115200n8";
-		/* bootargs = "root=/dev/mmcblk0p2 rootwait rw"; */
-		bootargs = "ubi.mtd=system  root=ubi0:rootfs rootfstype=ubifs rootwait rw";
 	};
 
 	aliases {

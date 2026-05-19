@@ -1,0 +1,14 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+
+/dts-v1/;
+
+#include "sun8i-t113-llz.dtsi"
+
+/ {
+	model = "LLZ T113 V1 (SPI NAND)";
+	compatible = "widora,mangopi-mq-r-t113", "allwinner,sun8i-t113s";
+
+	chosen {
+		bootargs = "ubi.mtd=system  root=ubi0:rootfs rootfstype=ubifs rootwait rw";
+	};
+};
